@@ -15,7 +15,7 @@ export default function Nav() {
               <Link href="/" className="hover:opacity-70 transition-opacity">Home</Link>
               <Link href="/thoughts" className="hover:opacity-70 transition-opacity">Thoughts</Link>
               <Link href="/contact" className="hover:opacity-70 transition-opacity">Contact</Link>
-              <Link href="/login" className="text-sm opacity-50 hover:opacity-70 transition-opacity">Login</Link>
+             
             </div>
             <ThemeToggle />
           </div>
