@@ -4,7 +4,7 @@ import ThemeToggle from './ThemeToggle';
 
 export default function Nav() {
   return (
-    <nav className="w-full sticky top-0 z-50 mb-8" style={{ marginLeft: 0, marginRight: 0 }}>
+    <nav className="w-full sticky top-0 z-[100] mb-8" style={{ marginLeft: 0, marginRight: 0 }}>
       <div className="glass-card">
         <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
           <Link href="/" className="text-2xl font-bold hover:opacity-80 transition-opacity">

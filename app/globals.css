@@ -60,6 +60,12 @@ body > * {
   z-index: 1;
 }
 
+/* Navigation always on top */
+nav {
+  position: relative;
+  z-index: 100 !important;
+}
+
 /* Glassy card effect */
 .glass-card {
   background: var(--glass-bg);
@@ -137,4 +143,32 @@ nav a {
 nav.sticky {
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
+}
+
+/* Hero Section Canvas - Full Screen Fit */
+#lights {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100% !important;
+  height: 100% !important;
+  overflow: hidden;
+}
+
+#lights canvas {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
+  object-fit: cover;
+}
+
+/* Mobile responsive fixes */
+@media (max-width: 768px) {
+  #lights,
+  #lights canvas {
+    touch-action: none;
+  }
 }

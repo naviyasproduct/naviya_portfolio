@@ -27,7 +27,7 @@ export default function RootLayout({ children }) {
       >
         <ClientThemeWrapper>
           <Nav />
-          <main style={{ padding: '2rem 1rem', maxWidth: '1280px', margin: '0 auto' }}>
+          <main>
             {children}
           </main>
         </ClientThemeWrapper>

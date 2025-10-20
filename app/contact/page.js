@@ -1,6 +1,6 @@
 export default function ContactPage() {
   return (
-    <div className="max-w-2xl mx-auto min-h-[70vh] flex items-center justify-center">
+    <div className="max-w-2xl mx-auto min-h-[70vh] flex items-center justify-center" style={{ padding: '2rem 1rem' }}>
       <div className="glass-card p-12 w-full">
         <h1 className="text-4xl font-bold mb-6">Get in Touch</h1>
         <p className="text-lg opacity-80 mb-8 leading-relaxed">

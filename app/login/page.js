@@ -24,7 +24,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="max-w-md mx-auto min-h-[70vh] flex items-center justify-center">
+    <div className="max-w-md mx-auto min-h-[70vh] flex items-center justify-center" style={{ padding: '2rem 1rem' }}>
       <div className="glass-card p-10 w-full">
         <h1 className="text-3xl font-bold mb-6 text-center">Admin Login</h1>
         <form onSubmit={submit} className="flex flex-col gap-4">

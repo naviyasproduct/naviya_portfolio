@@ -17,9 +17,15 @@ export default function ThemeToggle() {
 
   return (
     <button
-      onClick={toggleTheme}
+      onClick={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        console.log('Theme toggle clicked, current theme:', theme);
+        toggleTheme();
+      }}
       className="glass-button flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-300 hover:scale-105"
       aria-label="Toggle theme"
+      style={{ cursor: 'pointer', position: 'relative', zIndex: 1000 }}
     >
       {theme === 'light' ? (
         <>
