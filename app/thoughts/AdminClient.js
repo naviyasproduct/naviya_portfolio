@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { collection, query, orderBy, getDocs } from 'firebase/firestore';
 import { db } from '../../lib/firebaseConfig';
+import Image from 'next/image';
 
 export default function AdminClient() {
   const [title, setTitle] = useState('');
@@ -217,8 +218,14 @@ export default function AdminClient() {
                 {p.mediaType && p.mediaType.startsWith('video') ? (
                   <video controls src={p.mediaUrl} className="w-full max-h-96 object-contain rounded-xl bg-black/5" />
                 ) : (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={p.mediaUrl} alt={p.title || 'media'} className="w-full max-h-96 object-contain rounded-xl" />
+                  <Image 
+                    src={p.mediaUrl} 
+                    alt={p.title || 'media'} 
+                    width={800}
+                    height={400}
+                    className="w-full max-h-96 object-contain rounded-xl" 
+                    style={{ height: 'auto' }}
+                  />
                 )}
               </div>
             )}
