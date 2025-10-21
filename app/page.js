@@ -43,7 +43,7 @@ export default function Home() {
           <h1 style={{ 
             fontSize: 'clamp(2.5rem, 10vw, 6rem)', 
             fontWeight: 'bold', 
-            marginBottom: 'clamp(1rem, 1vw, 1.5rem)',
+            marginBottom: '1px',
             color: textColor,
             lineHeight: 1.1,
             letterSpacing: '0.05em'
@@ -58,7 +58,7 @@ export default function Home() {
             margin: 0,
             opacity: 0.95
           }}>
-            Be simple, and be Connected
+            Be simple, Be connected
           </p>
         </div>
       </div>

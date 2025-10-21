@@ -221,25 +221,68 @@ export default function BlockBasedAdminClient() {
   const handleLogout = async () => {
     try {
       await fetch('/api/admin/logout', { method: 'POST' });
-      window.location.href = '/admin/login';
+      window.location.href = '/login';
     } catch (err) {
       console.error('Logout failed:', err);
     }
   };
 
   return (
-    <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '2rem 1rem' }}>
-      {/* Logout Button */}
-      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1.5rem' }}>
+    <div style={{ 
+      maxWidth: '1200px', 
+      margin: '0 auto', 
+      padding: '1rem',
+    }}>
+      {/* Top Action Buttons */}
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: '1rem',
+        gap: '1rem',
+        flexWrap: 'wrap',
+      }}>
+        {/* Manage Thoughts Button */}
+        <button
+          onClick={() => window.location.href = '/thoughts/manage'}
+          type="button"
+          style={{
+            padding: '0.75rem 1.5rem',
+            background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(168, 85, 247, 0.2))',
+            border: '1.5px solid rgba(99, 102, 241, 0.4)',
+            borderRadius: '12px',
+            fontSize: 'clamp(0.9rem, 2vw, 1rem)',
+            fontWeight: '600',
+            cursor: 'pointer',
+            transition: 'all 0.3s ease',
+            boxShadow: '0 2px 8px rgba(99, 102, 241, 0.2)',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = 'linear-gradient(135deg, rgba(99, 102, 241, 0.3), rgba(168, 85, 247, 0.3))';
+            e.currentTarget.style.borderColor = 'rgba(99, 102, 241, 0.6)';
+            e.currentTarget.style.transform = 'translateY(-2px)';
+            e.currentTarget.style.boxShadow = '0 4px 16px rgba(99, 102, 241, 0.3)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = 'linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(168, 85, 247, 0.2))';
+            e.currentTarget.style.borderColor = 'rgba(99, 102, 241, 0.4)';
+            e.currentTarget.style.transform = 'translateY(0)';
+            e.currentTarget.style.boxShadow = '0 2px 8px rgba(99, 102, 241, 0.2)';
+          }}
+        >
+          📋 Manage All Thoughts
+        </button>
+
+        {/* Logout Button */}
         <button
           onClick={handleLogout}
           type="button"
           style={{
-            padding: '0.75rem 1.5rem',
+            padding: '0.65rem 1.25rem',
             background: 'rgba(239, 68, 68, 0.1)',
             border: '1.5px solid rgba(239, 68, 68, 0.3)',
             borderRadius: '12px',
-            fontSize: '0.95rem',
+            fontSize: 'clamp(0.85rem, 2vw, 0.95rem)',
             fontWeight: '600',
             color: '#ef4444',
             cursor: 'pointer',
@@ -263,12 +306,16 @@ export default function BlockBasedAdminClient() {
         background: 'rgba(255, 255, 255, 0.05)',
         backdropFilter: 'blur(30px)',
         border: '2px solid rgba(255, 255, 255, 0.1)',
-        borderRadius: '24px',
-        padding: '2.5rem',
-        marginBottom: '3rem',
+        borderRadius: 'clamp(16px, 3vw, 24px)',
+        padding: 'clamp(1.25rem, 4vw, 2.5rem)',
+        marginBottom: '2rem',
         boxShadow: '0 8px 32px rgba(0, 0, 0, 0.15)',
       }}>
-        <h2 style={{ fontSize: '2rem', fontWeight: '700', marginBottom: '2rem' }}>
+        <h2 style={{ 
+          fontSize: 'clamp(1.5rem, 4vw, 2rem)', 
+          fontWeight: '700', 
+          marginBottom: 'clamp(1rem, 3vw, 2rem)',
+        }}>
           ✨ Create New Thought
         </h2>
 
@@ -292,12 +339,12 @@ export default function BlockBasedAdminClient() {
               placeholder="Enter your thought title..."
               style={{
                 width: '100%',
-                padding: '1rem 1.25rem',
+                padding: 'clamp(0.75rem, 2vw, 1rem) clamp(1rem, 2.5vw, 1.25rem)',
                 background: 'rgba(255, 255, 255, 0.05)',
                 backdropFilter: 'blur(10px)',
                 border: '1.5px solid rgba(255, 255, 255, 0.15)',
                 borderRadius: '12px',
-                fontSize: '1.1rem',
+                fontSize: 'clamp(0.95rem, 2.5vw, 1.1rem)',
                 fontWeight: '600',
                 outline: 'none',
                 transition: 'all 0.3s ease',
@@ -364,11 +411,11 @@ export default function BlockBasedAdminClient() {
                 type="button"
                 onClick={() => setShowBlockMenu(!showBlockMenu)}
                 style={{
-                  padding: '0.5rem 1rem',
+                  padding: 'clamp(0.5rem, 1.5vw, 0.65rem) clamp(0.85rem, 2vw, 1rem)',
                   background: 'linear-gradient(135deg, #6366f1, #a855f7)',
                   border: 'none',
                   borderRadius: '8px',
-                  fontSize: '0.9rem',
+                  fontSize: 'clamp(0.85rem, 2vw, 0.9rem)',
                   fontWeight: '600',
                   cursor: 'pointer',
                   transition: 'all 0.3s ease',
@@ -382,10 +429,10 @@ export default function BlockBasedAdminClient() {
             {showBlockMenu && (
               <div style={{
                 display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
-                gap: '0.75rem',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))',
+                gap: 'clamp(0.5rem, 1.5vw, 0.75rem)',
                 marginBottom: '1.5rem',
-                padding: '1rem',
+                padding: 'clamp(0.75rem, 2vw, 1rem)',
                 background: 'rgba(255, 255, 255, 0.05)',
                 borderRadius: '12px',
                 border: '1px solid rgba(255, 255, 255, 0.1)',
@@ -460,13 +507,13 @@ export default function BlockBasedAdminClient() {
             disabled={loading}
             style={{
               width: '100%',
-              padding: '1rem',
+              padding: 'clamp(0.85rem, 2.5vw, 1rem)',
               background: loading 
                 ? 'rgba(255, 255, 255, 0.1)' 
                 : 'linear-gradient(135deg, #6366f1, #a855f7)',
               border: 'none',
               borderRadius: '12px',
-              fontSize: '1.1rem',
+              fontSize: 'clamp(0.95rem, 2.5vw, 1.1rem)',
               fontWeight: '700',
               cursor: loading ? 'not-allowed' : 'pointer',
               transition: 'all 0.3s ease',
@@ -480,7 +527,11 @@ export default function BlockBasedAdminClient() {
 
       {/* Existing Thoughts List */}
       <div>
-        <h2 style={{ fontSize: '1.75rem', fontWeight: '700', marginBottom: '1.5rem' }}>
+        <h2 style={{ 
+          fontSize: 'clamp(1.25rem, 3.5vw, 1.75rem)', 
+          fontWeight: '700', 
+          marginBottom: '1.5rem',
+        }}>
           📚 Your Thoughts ({posts.length})
         </h2>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
@@ -598,7 +649,7 @@ function BlockEditor({ block, index, totalBlocks, onUpdate, onDelete, onMove }) 
 
   return (
     <div style={{
-      padding: '1.5rem',
+      padding: 'clamp(0.85rem, 2.5vw, 1.5rem)',
       background: 'rgba(255, 255, 255, 0.03)',
       border: '1px solid rgba(255, 255, 255, 0.15)',
       borderRadius: '12px',
@@ -607,8 +658,10 @@ function BlockEditor({ block, index, totalBlocks, onUpdate, onDelete, onMove }) 
       {/* Block Controls */}
       <div style={{
         display: 'flex',
+        flexWrap: 'wrap',
         alignItems: 'center',
         justifyContent: 'space-between',
+        gap: '0.5rem',
         marginBottom: '1rem',
         paddingBottom: '0.75rem',
         borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
@@ -930,22 +983,22 @@ function getBlockLabel(type) {
 
 // Styles
 const blockButtonStyle = {
-  padding: '0.75rem 1rem',
+  padding: 'clamp(0.6rem, 1.5vw, 0.75rem) clamp(0.85rem, 2vw, 1rem)',
   background: 'rgba(255, 255, 255, 0.05)',
   border: '1px solid rgba(255, 255, 255, 0.15)',
   borderRadius: '8px',
-  fontSize: '0.9rem',
+  fontSize: 'clamp(0.8rem, 2vw, 0.9rem)',
   fontWeight: '600',
   cursor: 'pointer',
   transition: 'all 0.2s ease',
 };
 
 const controlButtonStyle = {
-  padding: '0.25rem 0.5rem',
+  padding: 'clamp(0.2rem, 1vw, 0.25rem) clamp(0.4rem, 1.5vw, 0.5rem)',
   background: 'rgba(255, 255, 255, 0.05)',
   border: '1px solid rgba(255, 255, 255, 0.15)',
   borderRadius: '6px',
-  fontSize: '0.85rem',
+  fontSize: 'clamp(0.75rem, 1.8vw, 0.85rem)',
   cursor: 'pointer',
 };
 

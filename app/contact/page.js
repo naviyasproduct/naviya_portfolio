@@ -78,13 +78,14 @@ export default function ContactPage() {
       {isCursorAnimationEnabled && <SplashCursor />}
       
       <div 
-        className="min-h-[calc(100vh-130px)] flex items-center justify-center py-6 px-4 sm:px-6 lg:px-8"
+        className="min-h-[calc(100vh-130px)] flex items-center justify-center"
         style={{
           position: 'relative',
-          zIndex: 10
+          zIndex: 10,
+          padding: 'clamp(1.5rem, 4vw, 2.5rem) clamp(1rem, 3vw, 1.5rem)',
         }}
       >
-        <div className="max-w-3xl w-full">
+        <div className="w-full" style={{ maxWidth: 'clamp(500px, 85vw, 650px)' }}>
           {/* Main Glass Container */}
           <div 
             style={{
@@ -92,19 +93,21 @@ export default function ContactPage() {
               backdropFilter: 'blur(30px)',
               WebkitBackdropFilter: 'blur(30px)',
               border: '2px solid rgba(255, 255, 255, 0.2)',
-              borderRadius: '24px',
+              borderRadius: 'clamp(16px, 3vw, 20px)',
               boxShadow: '0 8px 32px 0 rgba(0, 0, 0, 0.15), 0 4px 16px 0 rgba(0, 0, 0, 0.1), inset 0 1px 0 0 rgba(255, 255, 255, 0.1)',
-              padding: '3rem',
+              padding: 'clamp(1.25rem, 3vw, 2rem)',
               margin: '0 auto',
               position: 'relative',
               zIndex: 10
             }}
           >
             {/* Header Section */}
-            <div className="text-center mb-10">
+            <div className="text-center" style={{ marginBottom: 'clamp(1.5rem, 3vw, 2rem)' }}>
               <h1 
-                className="text-5xl font-bold mb-3"
                 style={{
+                  fontSize: 'clamp(1.75rem, 5vw, 2.25rem)',
+                  fontWeight: 'bold',
+                  marginBottom: 'clamp(0.5rem, 1.5vw, 0.75rem)',
                   background: 'linear-gradient(135deg, rgba(255,255,255,1) 0%, rgba(255,255,255,0.7) 100%)',
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent',
@@ -123,17 +126,17 @@ export default function ContactPage() {
                   backdropFilter: 'blur(10px)',
                   border: '1.5px solid rgba(255, 255, 255, 0.15)',
                   borderRadius: '50px',
-                  padding: '0.75rem 1.5rem',
-                  marginTop: '0.5rem',
+                  padding: 'clamp(0.5rem, 1.5vw, 0.65rem) clamp(1rem, 3vw, 1.25rem)',
+                  marginTop: 'clamp(0.25rem, 1vw, 0.5rem)',
                   boxShadow: '0 4px 16px rgba(0, 0, 0, 0.1)'
                 }}
               >
                 <a 
                   href="mailto:naveensaranga1212@email.com"
                   className="flex items-center gap-2 opacity-80 hover:opacity-100 transition-all"
-                  style={{ fontSize: '1.1rem' }}
+                  style={{ fontSize: 'clamp(0.85rem, 2vw, 0.95rem)' }}
                 >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg style={{ width: 'clamp(16px, 3vw, 18px)', height: 'clamp(16px, 3vw, 18px)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                   </svg>
                   naveensaranga1212@email.com
@@ -146,18 +149,22 @@ export default function ContactPage() {
               style={{
                 height: '1px',
                 background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent)',
-                marginBottom: '2.5rem'
+                marginBottom: 'clamp(1.25rem, 3vw, 1.75rem)'
               }}
             />
 
             {/* Contact Form */}
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 'clamp(1rem, 2.5vw, 1.25rem)' }}>
             {/* Name Field */}
             <div>
               <label 
                 htmlFor="name" 
-                className="block text-sm font-semibold mb-3 opacity-90"
-                style={{ letterSpacing: '0.05em' }}
+                className="block font-semibold opacity-90"
+                style={{ 
+                  letterSpacing: '0.05em',
+                  fontSize: 'clamp(0.75rem, 2vw, 0.85rem)',
+                  marginBottom: 'clamp(0.5rem, 1.5vw, 0.65rem)'
+                }}
               >
                 YOUR NAME *
               </label>
@@ -171,14 +178,14 @@ export default function ContactPage() {
                 placeholder="Your name"
                 style={{
                   width: '100%',
-                  padding: '1rem 1.25rem',
-                  borderRadius: '16px',
+                  padding: 'clamp(0.75rem, 2vw, 0.9rem) clamp(1rem, 2.5vw, 1.15rem)',
+                  borderRadius: 'clamp(12px, 2vw, 14px)',
                   background: 'rgba(255, 255, 255, 0.05)',
                   backdropFilter: 'blur(10px)',
                   border: '1.5px solid rgba(255, 255, 255, 0.15)',
                   outline: 'none',
                   transition: 'all 0.3s ease',
-                  fontSize: '1rem',
+                  fontSize: 'clamp(0.9rem, 2vw, 0.95rem)',
                   boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)'
                 }}
                 onFocus={(e) => {
@@ -198,8 +205,12 @@ export default function ContactPage() {
             <div>
               <label 
                 htmlFor="email" 
-                className="block text-sm font-semibold mb-3 opacity-90"
-                style={{ letterSpacing: '0.05em' }}
+                className="block font-semibold opacity-90"
+                style={{ 
+                  letterSpacing: '0.05em',
+                  fontSize: 'clamp(0.75rem, 2vw, 0.85rem)',
+                  marginBottom: 'clamp(0.5rem, 1.5vw, 0.65rem)'
+                }}
               >
                 YOUR EMAIL *
               </label>
@@ -213,14 +224,14 @@ export default function ContactPage() {
                 placeholder="your.email@example.com"
                 style={{
                   width: '100%',
-                  padding: '1rem 1.25rem',
-                  borderRadius: '16px',
+                  padding: 'clamp(0.75rem, 2vw, 0.9rem) clamp(1rem, 2.5vw, 1.15rem)',
+                  borderRadius: 'clamp(12px, 2vw, 14px)',
                   background: 'rgba(255, 255, 255, 0.05)',
                   backdropFilter: 'blur(10px)',
                   border: '1.5px solid rgba(255, 255, 255, 0.15)',
                   outline: 'none',
                   transition: 'all 0.3s ease',
-                  fontSize: '1rem',
+                  fontSize: 'clamp(0.9rem, 2vw, 0.95rem)',
                   boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)'
                 }}
                 onFocus={(e) => {
@@ -240,8 +251,12 @@ export default function ContactPage() {
             <div>
               <label 
                 htmlFor="subject" 
-                className="block text-sm font-semibold mb-3 opacity-90"
-                style={{ letterSpacing: '0.05em' }}
+                className="block font-semibold opacity-90"
+                style={{ 
+                  letterSpacing: '0.05em',
+                  fontSize: 'clamp(0.75rem, 2vw, 0.85rem)',
+                  marginBottom: 'clamp(0.5rem, 1.5vw, 0.65rem)'
+                }}
               >
                 SUBJECT *
               </label>
@@ -255,14 +270,14 @@ export default function ContactPage() {
                 placeholder="What's this about?"
                 style={{
                   width: '100%',
-                  padding: '1rem 1.25rem',
-                  borderRadius: '16px',
+                  padding: 'clamp(0.75rem, 2vw, 0.9rem) clamp(1rem, 2.5vw, 1.15rem)',
+                  borderRadius: 'clamp(12px, 2vw, 14px)',
                   background: 'rgba(255, 255, 255, 0.05)',
                   backdropFilter: 'blur(10px)',
                   border: '1.5px solid rgba(255, 255, 255, 0.15)',
                   outline: 'none',
                   transition: 'all 0.3s ease',
-                  fontSize: '1rem',
+                  fontSize: 'clamp(0.9rem, 2vw, 0.95rem)',
                   boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)'
                 }}
                 onFocus={(e) => {
@@ -282,8 +297,12 @@ export default function ContactPage() {
             <div>
               <label 
                 htmlFor="message" 
-                className="block text-sm font-semibold mb-3 opacity-90"
-                style={{ letterSpacing: '0.05em' }}
+                className="block font-semibold opacity-90"
+                style={{ 
+                  letterSpacing: '0.05em',
+                  fontSize: 'clamp(0.75rem, 2vw, 0.85rem)',
+                  marginBottom: 'clamp(0.5rem, 1.5vw, 0.65rem)'
+                }}
               >
                 MESSAGE *
               </label>
@@ -293,20 +312,20 @@ export default function ContactPage() {
                 value={formData.message}
                 onChange={handleChange}
                 required
-                rows="6"
+                rows="5"
                 placeholder="Tell me what's on your mind..."
                 style={{
                   width: '100%',
-                  padding: '1rem 1.25rem',
-                  borderRadius: '16px',
+                  padding: 'clamp(0.75rem, 2vw, 0.9rem) clamp(1rem, 2.5vw, 1.15rem)',
+                  borderRadius: 'clamp(12px, 2vw, 14px)',
                   background: 'rgba(255, 255, 255, 0.05)',
                   backdropFilter: 'blur(10px)',
                   border: '1.5px solid rgba(255, 255, 255, 0.15)',
                   outline: 'none',
                   transition: 'all 0.3s ease',
-                  fontSize: '1rem',
+                  fontSize: 'clamp(0.9rem, 2vw, 0.95rem)',
                   resize: 'vertical',
-                  minHeight: '150px',
+                  minHeight: 'clamp(120px, 20vw, 140px)',
                   boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)'
                 }}
                 onFocus={(e) => {
@@ -326,8 +345,8 @@ export default function ContactPage() {
             {status.message && (
               <div 
                 style={{
-                  padding: '1.25rem 1.5rem',
-                  borderRadius: '16px',
+                  padding: 'clamp(0.75rem, 2vw, 0.9rem) clamp(1rem, 2.5vw, 1.15rem)',
+                  borderRadius: 'clamp(12px, 2vw, 14px)',
                   background: status.type === 'success' 
                     ? 'rgba(34, 197, 94, 0.1)' 
                     : 'rgba(239, 68, 68, 0.1)',
@@ -338,11 +357,11 @@ export default function ContactPage() {
                   color: status.type === 'success' ? '#86efac' : '#fca5a5',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '0.75rem',
-                  fontSize: '0.95rem'
+                  gap: 'clamp(0.5rem, 1.5vw, 0.65rem)',
+                  fontSize: 'clamp(0.85rem, 2vw, 0.9rem)'
                 }}
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg style={{ width: 'clamp(18px, 3vw, 20px)', height: 'clamp(18px, 3vw, 20px)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   {status.type === 'success' ? (
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   ) : (
@@ -359,15 +378,15 @@ export default function ContactPage() {
               disabled={isSubmitting}
               style={{
                 width: '100%',
-                padding: '1.25rem',
-                borderRadius: '16px',
+                padding: 'clamp(0.9rem, 2.5vw, 1.1rem)',
+                borderRadius: 'clamp(12px, 2vw, 14px)',
                 background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.05) 100%)',
                 backdropFilter: 'blur(20px)',
                 border: '1px solid rgba(255, 255, 255, 0.25)',
                 boxShadow: '0 8px 24px 0 rgba(0, 0, 0, 0.2), inset 0 1px 0 0 rgba(255, 255, 255, 0.2)',
                 cursor: isSubmitting ? 'not-allowed' : 'pointer',
                 transition: 'all 0.3s ease',
-                fontSize: '1.1rem',
+                fontSize: 'clamp(0.95rem, 2.2vw, 1.05rem)',
                 fontWeight: '600',
                 letterSpacing: '0.05em',
                 opacity: isSubmitting ? 0.5 : 1

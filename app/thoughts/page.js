@@ -6,7 +6,7 @@ export default function ThoughtsPage() {
     <>
       <section 
       style={{ 
-        padding: '3rem 1.5rem',
+        padding: 'clamp(1.5rem, 4vw, 3rem) clamp(1rem, 3vw, 1.5rem)',
         minHeight: '100vh',
         display: 'flex',
         flexDirection: 'column',
@@ -20,25 +20,26 @@ export default function ThoughtsPage() {
       {/* Header */}
       <div 
         style={{
-          marginBottom: '3rem',
+          marginBottom: 'clamp(2rem, 4vw, 3rem)',
           textAlign: 'center',
           width: '100%',
           maxWidth: '800px',
+          padding: '0 1rem',
         }}
       >
         <h1 
           className="theme-text"
           style={{
-            fontSize: 'clamp(2.5rem, 5vw, 4rem)',
+            fontSize: 'clamp(2rem, 6vw, 4rem)',
             fontWeight: '800',
-            marginBottom: '1rem',
+            marginBottom: 'clamp(0.75rem, 2vw, 1rem)',
           }}
         >
           Thoughts
         </h1>
         <p 
           style={{
-            fontSize: '1.1rem',
+            fontSize: 'clamp(0.95rem, 2.5vw, 1.1rem)',
             opacity: 0.7,
             maxWidth: '600px',
             margin: '0 auto',

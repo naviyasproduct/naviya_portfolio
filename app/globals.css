@@ -165,10 +165,79 @@ nav.sticky {
   object-fit: cover;
 }
 
+/* Mobile menu animation */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Desktop - hide mobile menu elements */
+@media (min-width: 640px) {
+  .sm\:hidden {
+    display: none !important;
+  }
+}
+
 /* Mobile responsive fixes */
 @media (max-width: 768px) {
   #lights,
   #lights canvas {
     touch-action: none;
+  }
+  
+  /* Better mobile spacing */
+  body {
+    padding-bottom: 2rem;
+  }
+  
+  /* Responsive text */
+  h1 {
+    font-size: clamp(1.5rem, 5vw, 3rem) !important;
+  }
+  
+  h2 {
+    font-size: clamp(1.25rem, 4vw, 2rem) !important;
+  }
+  
+  /* Responsive containers */
+  .container {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+  
+  /* Mobile form inputs */
+  input, textarea, select {
+    font-size: 16px !important; /* Prevents zoom on iOS */
+  }
+  
+  /* Mobile buttons - ensure proper alignment */
+  button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  /* Mobile admin panel */
+  .admin-panel {
+    padding: 1rem !important;
+  }
+  
+  /* Navigation adjustments */
+  nav {
+    padding-left: 0.5rem !important;
+    padding-right: 0.5rem !important;
+  }
+}
+
+/* Tablet responsive */
+@media (max-width: 1024px) and (min-width: 769px) {
+  body {
+    padding: 0 1.5rem;
   }
 }

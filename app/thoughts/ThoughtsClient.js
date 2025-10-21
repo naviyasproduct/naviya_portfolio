@@ -137,7 +137,7 @@ export default function ThoughtsClient() {
           <div key={dateString} style={{ width: '100%' }}>
             {/* Date Header - Calendar Style */}
             <button
-              onClick={() => !isToday && toggleDate(dateString)}
+              onClick={() => toggleDate(dateString)}
               style={{
                 width: '100%',
                 padding: isToday ? '1.5rem 2rem' : '1rem 1.5rem',
@@ -149,7 +149,7 @@ export default function ThoughtsClient() {
                   ? '2px solid rgba(99, 102, 241, 0.3)'
                   : '1px solid rgba(255, 255, 255, 0.1)',
                 borderRadius: '20px',
-                cursor: isToday ? 'default' : 'pointer',
+                cursor: 'pointer',
                 transition: 'all 0.3s ease',
                 display: 'flex',
                 alignItems: 'center',
@@ -161,14 +161,22 @@ export default function ThoughtsClient() {
                   : '0 4px 16px rgba(0, 0, 0, 0.1)',
               }}
               onMouseEnter={(e) => {
-                if (!isToday) {
+                if (isToday) {
+                  e.currentTarget.style.background = 'linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(168, 85, 247, 0.2))';
+                  e.currentTarget.style.borderColor = 'rgba(99, 102, 241, 0.4)';
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                } else {
                   e.currentTarget.style.background = 'rgba(255, 255, 255, 0.08)';
                   e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.2)';
                   e.currentTarget.style.transform = 'translateY(-2px)';
                 }
               }}
               onMouseLeave={(e) => {
-                if (!isToday) {
+                if (isToday) {
+                  e.currentTarget.style.background = 'linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(168, 85, 247, 0.15))';
+                  e.currentTarget.style.borderColor = 'rgba(99, 102, 241, 0.3)';
+                  e.currentTarget.style.transform = 'translateY(0)';
+                } else {
                   e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)';
                   e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.1)';
                   e.currentTarget.style.transform = 'translateY(0)';
@@ -227,20 +235,18 @@ export default function ThoughtsClient() {
               </div>
 
               {/* Expand Icon */}
-              {!isToday && (
-                <div style={{
-                  fontSize: '1.5rem',
-                  opacity: 0.5,
-                  transition: 'transform 0.3s ease',
-                  transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)',
-                }}>
-                  ▼
-                </div>
-              )}
+              <div style={{
+                fontSize: '1.5rem',
+                opacity: 0.5,
+                transition: 'transform 0.3s ease',
+                transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)',
+              }}>
+                ▼
+              </div>
             </button>
 
-            {/* Posts Grid - Show if expanded or if today */}
-            {(isExpanded || isToday) && (
+            {/* Posts Grid - Show if expanded */}
+            {isExpanded && (
               <div style={{
                 display: 'grid',
                 gap: '1rem',
