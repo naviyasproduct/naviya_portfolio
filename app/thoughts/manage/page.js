@@ -12,6 +12,7 @@ export default function ManageThoughtsPage() {
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [expandedDates, setExpandedDates] = useState({});
 
   // Load all thoughts
   useEffect(() => {
@@ -25,6 +26,10 @@ export default function ManageThoughtsPage() {
           createdAt: doc.data().createdAt?.toDate ? doc.data().createdAt.toDate() : new Date(),
         }));
         setThoughts(thoughtsData);
+        
+        // Set today's date as expanded by default
+        const todayStr = new Date().toDateString();
+        setExpandedDates({ [todayStr]: true });
       } catch (err) {
         console.error('Error loading thoughts:', err);
       } finally {
@@ -89,6 +94,14 @@ export default function ManageThoughtsPage() {
 
   // Get today's date string
   const today = new Date().toDateString();
+
+  // Toggle date expansion
+  const toggleDate = (dateStr) => {
+    setExpandedDates(prev => ({
+      ...prev,
+      [dateStr]: !prev[dateStr]
+    }));
+  };
 
   if (loading) {
     return (
@@ -233,17 +246,40 @@ export default function ManageThoughtsPage() {
               const dayName = date.toLocaleDateString('en-US', { weekday: 'long' });
               const monthDay = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 
+              const isExpanded = expandedDates[dateStr];
+
               return (
                 <div key={dateStr}>
-                  {/* Date Header */}
-                  <div style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '1rem',
-                    marginBottom: '1.25rem',
-                    paddingBottom: '0.75rem',
-                    borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
-                  }}>
+                  {/* Date Header - Clickable */}
+                  <div 
+                    onClick={() => toggleDate(dateStr)}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '1rem',
+                      marginBottom: isExpanded ? '1.25rem' : '0',
+                      paddingBottom: '0.75rem',
+                      borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease',
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = 'rgba(255, 255, 255, 0.03)';
+                      e.currentTarget.style.marginLeft = '-1rem';
+                      e.currentTarget.style.marginRight = '-1rem';
+                      e.currentTarget.style.paddingLeft = '1rem';
+                      e.currentTarget.style.paddingRight = '1rem';
+                      e.currentTarget.style.borderRadius = '12px';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = 'transparent';
+                      e.currentTarget.style.marginLeft = '0';
+                      e.currentTarget.style.marginRight = '0';
+                      e.currentTarget.style.paddingLeft = '0';
+                      e.currentTarget.style.paddingRight = '0';
+                      e.currentTarget.style.borderRadius = '0';
+                    }}
+                  >
                     <div style={{
                       width: '48px',
                       height: '48px',
@@ -256,9 +292,9 @@ export default function ManageThoughtsPage() {
                       fontSize: '1.25rem',
                       fontWeight: '600',
                     }}>
-                      📅
+                      {isExpanded ? '📅' : '📁'}
                     </div>
-                    <div>
+                    <div style={{ flex: 1 }}>
                       <div style={{
                         fontSize: '1.25rem',
                         fontWeight: '600',
@@ -288,24 +324,34 @@ export default function ManageThoughtsPage() {
                       </div>
                     </div>
                     <div style={{
-                      marginLeft: 'auto',
                       padding: '0.35rem 0.75rem',
                       background: 'rgba(255, 255, 255, 0.05)',
                       borderRadius: '8px',
                       fontSize: '0.85rem',
                       opacity: 0.7,
+                      marginRight: '0.5rem',
                     }}>
                       {groupedThoughts[dateStr].length} {groupedThoughts[dateStr].length === 1 ? 'thought' : 'thoughts'}
                     </div>
+                    <div style={{
+                      fontSize: '1.5rem',
+                      opacity: 0.6,
+                      transition: 'transform 0.2s ease',
+                      transform: isExpanded ? 'rotate(90deg)' : 'rotate(0deg)',
+                    }}>
+                      ▶
+                    </div>
                   </div>
 
-                  {/* Thoughts for this date */}
-                  <div style={{
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 350px), 1fr))',
-                    gap: 'clamp(1rem, 2vw, 1.5rem)',
-                  }}>
-                    {groupedThoughts[dateStr].map((thought) => (
+                  {/* Thoughts for this date - Only show if expanded */}
+                  {isExpanded && (
+                    <div style={{
+                      display: 'grid',
+                      gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 350px), 1fr))',
+                      gap: 'clamp(1rem, 2vw, 1.5rem)',
+                      animation: 'fadeIn 0.3s ease',
+                    }}>
+                      {groupedThoughts[dateStr].map((thought) => (
                       <div
                         key={thought.id}
                         style={{
@@ -464,7 +510,8 @@ export default function ManageThoughtsPage() {
                         </div>
                       </div>
                     ))}
-                  </div>
+                    </div>
+                  )}
                 </div>
               );
             })}

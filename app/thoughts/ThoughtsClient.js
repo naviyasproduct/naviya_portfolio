@@ -137,7 +137,7 @@ export default function ThoughtsClient() {
           <div key={dateString} style={{ width: '100%' }}>
             {/* Date Header - Calendar Style */}
             <button
-              onClick={() => !isToday && toggleDate(dateString)}
+              onClick={() => toggleDate(dateString)}
               style={{
                 width: '100%',
                 padding: isToday ? '1.5rem 2rem' : '1rem 1.5rem',
