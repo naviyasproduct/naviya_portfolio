@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState } from 'react';
 import { doc, getDoc, collection, addDoc, query, orderBy, onSnapshot, updateDoc, increment, arrayUnion, arrayRemove } from 'firebase/firestore';
 import { db } from '../../../lib/firebaseConfig';
 import { useParams } from 'next/navigation';
@@ -72,10 +72,6 @@ function RichContent({ content, additionalMedia }) {
                   alt="Content image"
                   width={800}
                   height={600}
-                  loading="lazy"
-                  quality={85}
-                  placeholder="blur"
-                  blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mM8c+bMfwAGgAL+DAhGLAAAAABJRU5ErkJggg=="
                   style={{
                     width: '100%',
                     height: 'auto',
@@ -183,33 +179,17 @@ export default function ThoughtPage() {
   const [thought, setThought] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [isAdmin, setIsAdmin] = useState(false);
   
   // Comments state
   const [comments, setComments] = useState([]);
   const [commentName, setCommentName] = useState('');
   const [commentText, setCommentText] = useState('');
   const [submittingComment, setSubmittingComment] = useState(false);
-  const [deletingComment, setDeletingComment] = useState(null);
   
   // Likes state
   const [likeCount, setLikeCount] = useState(0);
   const [hasLiked, setHasLiked] = useState(false);
   const [likingInProgress, setLikingInProgress] = useState(false);
-
-  // Check if user is admin
-  useEffect(() => {
-    const checkAdmin = async () => {
-      try {
-        const response = await fetch('/api/auth/check');
-        const data = await response.json();
-        setIsAdmin(data.isAuthenticated);
-      } catch (err) {
-        console.error('Error checking admin status:', err);
-      }
-    };
-    checkAdmin();
-  }, []);
 
   // Load thought data
   useEffect(() => {
@@ -340,36 +320,6 @@ export default function ThoughtPage() {
     }
   };
 
-  // Handle comment deletion (admin only)
-  const handleDeleteComment = async (commentId) => {
-    if (!confirm('Are you sure you want to delete this comment?')) return;
-    
-    setDeletingComment(commentId);
-    try {
-      const response = await fetch('/api/admin/comments/delete', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          thoughtId: params.id,
-          commentId: commentId
-        })
-      });
-
-      const data = await response.json();
-      
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to delete comment');
-      }
-      
-      // Comment will be removed automatically by the real-time listener
-    } catch (err) {
-      console.error('[ThoughtPage] Error deleting comment:', err);
-      alert('Failed to delete comment. Please try again.');
-    } finally {
-      setDeletingComment(null);
-    }
-  };
-
   if (loading) {
     return (
       <div style={{
@@ -464,15 +414,11 @@ export default function ThoughtPage() {
       flexDirection: 'column',
       alignItems: 'center',
     }}>
-      {/* Back Button and Edit Button */}
+      {/* Back Button */}
       <div style={{
         width: '100%',
         maxWidth: '800px',
         marginBottom: '2rem',
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        gap: '1rem',
       }}>
         <Link 
           href="/thoughts"
@@ -504,42 +450,6 @@ export default function ThoughtPage() {
           <span style={{ fontSize: '1.2rem' }}>←</span>
           <span>Back to Thoughts</span>
         </Link>
-
-        {/* Edit Button (Admin Only) */}
-        {isAdmin && (
-          <Link 
-            href={`/thoughts/${params.id}/edit`}
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '0.5rem',
-              padding: '0.75rem 1.5rem',
-              background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(168, 85, 247, 0.2))',
-              backdropFilter: 'blur(30px)',
-              border: '1px solid rgba(99, 102, 241, 0.3)',
-              borderRadius: '12px',
-              fontWeight: '600',
-              fontSize: '0.95rem',
-              transition: 'all 0.3s ease',
-              boxShadow: '0 2px 8px rgba(99, 102, 241, 0.2)',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.background = 'linear-gradient(135deg, rgba(99, 102, 241, 0.3), rgba(168, 85, 247, 0.3))';
-              e.currentTarget.style.borderColor = 'rgba(99, 102, 241, 0.5)';
-              e.currentTarget.style.transform = 'translateY(-2px)';
-              e.currentTarget.style.boxShadow = '0 4px 16px rgba(99, 102, 241, 0.3)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.background = 'linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(168, 85, 247, 0.2))';
-              e.currentTarget.style.borderColor = 'rgba(99, 102, 241, 0.3)';
-              e.currentTarget.style.transform = 'translateY(0)';
-              e.currentTarget.style.boxShadow = '0 2px 8px rgba(99, 102, 241, 0.2)';
-            }}
-          >
-            <span style={{ fontSize: '1.1rem' }}>✏️</span>
-            <span>Edit</span>
-          </Link>
-        )}
       </div>
 
       {/* Main Content */}
@@ -613,9 +523,6 @@ export default function ThoughtPage() {
                 alt={thought.title || 'thought'} 
                 width={800}
                 height={600}
-                quality={90}
-                placeholder="blur"
-                blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mM8c+bMfwAGgAL+DAhGLAAAAABJRU5ErkJggg=="
                 style={{
                   width: '100%',
                   height: 'auto',
@@ -895,7 +802,6 @@ export default function ThoughtPage() {
                   background: 'rgba(255, 255, 255, 0.03)',
                   borderRadius: '12px',
                   border: '1px solid rgba(255, 255, 255, 0.1)',
-                  position: 'relative',
                 }}
               >
                 <div style={{
@@ -912,59 +818,18 @@ export default function ThoughtPage() {
                     {comment.name}
                   </div>
                   <div style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '1rem',
+                    fontSize: '0.75rem',
+                    opacity: 0.5,
                   }}>
-                    <div style={{
-                      fontSize: '0.75rem',
-                      opacity: 0.5,
-                    }}>
-                      {comment.createdAt?.toDate ? 
-                        comment.createdAt.toDate().toLocaleDateString('default', { 
-                          month: 'short', 
-                          day: 'numeric',
-                          hour: '2-digit',
-                          minute: '2-digit'
-                        })
-                        : 'Just now'
-                      }
-                    </div>
-                    {/* Delete Button (Admin Only) */}
-                    {isAdmin && (
-                      <button
-                        onClick={() => handleDeleteComment(comment.id)}
-                        disabled={deletingComment === comment.id}
-                        style={{
-                          padding: '0.35rem 0.75rem',
-                          background: deletingComment === comment.id 
-                            ? 'rgba(239, 68, 68, 0.2)'
-                            : 'rgba(239, 68, 68, 0.1)',
-                          border: '1px solid rgba(239, 68, 68, 0.3)',
-                          borderRadius: '8px',
-                          fontSize: '0.75rem',
-                          fontWeight: '600',
-                          cursor: deletingComment === comment.id ? 'not-allowed' : 'pointer',
-                          transition: 'all 0.2s ease',
-                          color: '#fca5a5',
-                          opacity: deletingComment === comment.id ? 0.5 : 1,
-                        }}
-                        onMouseEnter={(e) => {
-                          if (deletingComment !== comment.id) {
-                            e.currentTarget.style.background = 'rgba(239, 68, 68, 0.2)';
-                            e.currentTarget.style.borderColor = 'rgba(239, 68, 68, 0.5)';
-                          }
-                        }}
-                        onMouseLeave={(e) => {
-                          if (deletingComment !== comment.id) {
-                            e.currentTarget.style.background = 'rgba(239, 68, 68, 0.1)';
-                            e.currentTarget.style.borderColor = 'rgba(239, 68, 68, 0.3)';
-                          }
-                        }}
-                      >
-                        {deletingComment === comment.id ? '🗑️ Deleting...' : '🗑️ Delete'}
-                      </button>
-                    )}
+                    {comment.createdAt?.toDate ? 
+                      comment.createdAt.toDate().toLocaleDateString('default', { 
+                        month: 'short', 
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                      })
+                      : 'Just now'
+                    }
                   </div>
                 </div>
                 <div style={{

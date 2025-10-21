@@ -2,7 +2,6 @@
 import { useEffect, useState } from 'react';
 import { collection, query, orderBy, getDocs } from 'firebase/firestore';
 import { db } from '../../lib/firebaseConfig';
-import Image from 'next/image';
 
 export default function BlockBasedAdminClient() {
   // Content blocks system
@@ -222,7 +221,7 @@ export default function BlockBasedAdminClient() {
   const handleLogout = async () => {
     try {
       await fetch('/api/admin/logout', { method: 'POST' });
-      window.location.href = '/login';
+      window.location.href = '/admin/login';
     } catch (err) {
       console.error('Logout failed:', err);
     }
@@ -234,47 +233,12 @@ export default function BlockBasedAdminClient() {
       margin: '0 auto', 
       padding: '1rem',
     }}>
-      {/* Top Action Buttons */}
+      {/* Logout Button */}
       <div style={{ 
         display: 'flex', 
-        justifyContent: 'space-between',
-        alignItems: 'center',
+        justifyContent: 'flex-end', 
         marginBottom: '1rem',
-        gap: '1rem',
-        flexWrap: 'wrap',
       }}>
-        {/* Manage Thoughts Button */}
-        <button
-          onClick={() => window.location.href = '/thoughts/manage'}
-          type="button"
-          style={{
-            padding: '0.75rem 1.5rem',
-            background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(168, 85, 247, 0.2))',
-            border: '1.5px solid rgba(99, 102, 241, 0.4)',
-            borderRadius: '12px',
-            fontSize: 'clamp(0.9rem, 2vw, 1rem)',
-            fontWeight: '600',
-            cursor: 'pointer',
-            transition: 'all 0.3s ease',
-            boxShadow: '0 2px 8px rgba(99, 102, 241, 0.2)',
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.background = 'linear-gradient(135deg, rgba(99, 102, 241, 0.3), rgba(168, 85, 247, 0.3))';
-            e.currentTarget.style.borderColor = 'rgba(99, 102, 241, 0.6)';
-            e.currentTarget.style.transform = 'translateY(-2px)';
-            e.currentTarget.style.boxShadow = '0 4px 16px rgba(99, 102, 241, 0.3)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.background = 'linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(168, 85, 247, 0.2))';
-            e.currentTarget.style.borderColor = 'rgba(99, 102, 241, 0.4)';
-            e.currentTarget.style.transform = 'translateY(0)';
-            e.currentTarget.style.boxShadow = '0 2px 8px rgba(99, 102, 241, 0.2)';
-          }}
-        >
-          📋 Manage All Thoughts
-        </button>
-
-        {/* Logout Button */}
         <button
           onClick={handleLogout}
           type="button"
@@ -852,12 +816,9 @@ function BlockEditor({ block, index, totalBlocks, onUpdate, onDelete, onMove }) 
                   cursor: 'ew-resize',
                 }}>
                   {block.type === 'image' ? (
-                    <Image
+                    <img
                       src={previewUrl}
                       alt="Preview"
-                      width={800}
-                      height={600}
-                      unoptimized
                       onMouseDown={handleMouseDown}
                       style={{
                         width: '100%',

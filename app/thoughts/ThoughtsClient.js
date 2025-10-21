@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState, useMemo, useCallback } from 'react';
+import { useEffect, useState } from 'react';
 import { collection, getDocs, query, orderBy } from 'firebase/firestore';
 import { db } from '../../lib/firebaseConfig';
 import Image from 'next/image';
@@ -8,33 +8,7 @@ export default function ThoughtsClient() {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [expandedDates, setExpandedDates] = useState(new Set());
-
-  // Memoize grouped posts calculation
-  const groupedPosts = useMemo(() => {
-    const grouped = {};
-    const today = new Date().toDateString();
-    
-    posts.forEach(post => {
-      if (post.createdAt?.toDate) {
-        const date = post.createdAt.toDate();
-        const dateString = date.toDateString();
-        
-        if (!grouped[dateString]) {
-          grouped[dateString] = [];
-        }
-        grouped[dateString].push(post);
-      }
-    });
-    
-    return grouped;
-  }, [posts]);
-
-  // Memoize sorted dates
-  const sortedDates = useMemo(() => {
-    return Object.keys(groupedPosts).sort((a, b) => {
-      return new Date(b) - new Date(a);
-    });
-  }, [groupedPosts]);
+  const [groupedPosts, setGroupedPosts] = useState({});
 
   useEffect(() => {
     let mounted = true;
@@ -48,17 +22,25 @@ export default function ThoughtsClient() {
         const postsData = snap.docs.map(d => ({ id: d.id, ...d.data() }));
         setPosts(postsData);
         
-        // Auto-expand today's posts
-        const today = new Date().toDateString();
+        // Group posts by date
         const grouped = {};
+        const today = new Date().toDateString();
+        
         postsData.forEach(post => {
           if (post.createdAt?.toDate) {
-            const dateString = post.createdAt.toDate().toDateString();
-            if (!grouped[dateString]) grouped[dateString] = [];
+            const date = post.createdAt.toDate();
+            const dateString = date.toDateString();
+            
+            if (!grouped[dateString]) {
+              grouped[dateString] = [];
+            }
             grouped[dateString].push(post);
           }
         });
         
+        setGroupedPosts(grouped);
+        
+        // Auto-expand today's posts
         if (grouped[today]) {
           setExpandedDates(new Set([today]));
         }
@@ -78,8 +60,7 @@ export default function ThoughtsClient() {
     return () => { mounted = false };
   }, []);
 
-  // Memoize toggle function
-  const toggleDate = useCallback((dateString) => {
+  const toggleDate = (dateString) => {
     setExpandedDates(prev => {
       const newSet = new Set(prev);
       if (newSet.has(dateString)) {
@@ -89,7 +70,7 @@ export default function ThoughtsClient() {
       }
       return newSet;
     });
-  }, []);
+  };
 
   if (loading) return (
     <div 
@@ -134,6 +115,7 @@ export default function ThoughtsClient() {
   );
 
   const today = new Date().toDateString();
+  const sortedDates = Object.keys(groupedPosts).sort((a, b) => new Date(b) - new Date(a));
 
   return (
     <div style={{ 
@@ -155,7 +137,7 @@ export default function ThoughtsClient() {
           <div key={dateString} style={{ width: '100%' }}>
             {/* Date Header - Calendar Style */}
             <button
-              onClick={() => toggleDate(dateString)}
+              onClick={() => !isToday && toggleDate(dateString)}
               style={{
                 width: '100%',
                 padding: isToday ? '1.5rem 2rem' : '1rem 1.5rem',
@@ -167,7 +149,7 @@ export default function ThoughtsClient() {
                   ? '2px solid rgba(99, 102, 241, 0.3)'
                   : '1px solid rgba(255, 255, 255, 0.1)',
                 borderRadius: '20px',
-                cursor: 'pointer',
+                cursor: isToday ? 'default' : 'pointer',
                 transition: 'all 0.3s ease',
                 display: 'flex',
                 alignItems: 'center',
@@ -179,22 +161,14 @@ export default function ThoughtsClient() {
                   : '0 4px 16px rgba(0, 0, 0, 0.1)',
               }}
               onMouseEnter={(e) => {
-                if (isToday) {
-                  e.currentTarget.style.background = 'linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(168, 85, 247, 0.2))';
-                  e.currentTarget.style.borderColor = 'rgba(99, 102, 241, 0.4)';
-                  e.currentTarget.style.transform = 'translateY(-2px)';
-                } else {
+                if (!isToday) {
                   e.currentTarget.style.background = 'rgba(255, 255, 255, 0.08)';
                   e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.2)';
                   e.currentTarget.style.transform = 'translateY(-2px)';
                 }
               }}
               onMouseLeave={(e) => {
-                if (isToday) {
-                  e.currentTarget.style.background = 'linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(168, 85, 247, 0.15))';
-                  e.currentTarget.style.borderColor = 'rgba(99, 102, 241, 0.3)';
-                  e.currentTarget.style.transform = 'translateY(0)';
-                } else {
+                if (!isToday) {
                   e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)';
                   e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.1)';
                   e.currentTarget.style.transform = 'translateY(0)';
@@ -253,18 +227,20 @@ export default function ThoughtsClient() {
               </div>
 
               {/* Expand Icon */}
-              <div style={{
-                fontSize: '1.5rem',
-                opacity: 0.5,
-                transition: 'transform 0.3s ease',
-                transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)',
-              }}>
-                ▼
-              </div>
+              {!isToday && (
+                <div style={{
+                  fontSize: '1.5rem',
+                  opacity: 0.5,
+                  transition: 'transform 0.3s ease',
+                  transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)',
+                }}>
+                  ▼
+                </div>
+              )}
             </button>
 
-            {/* Posts Grid - Show if expanded */}
-            {isExpanded && (
+            {/* Posts Grid - Show if expanded or if today */}
+            {(isExpanded || isToday) && (
               <div style={{
                 display: 'grid',
                 gap: '1rem',
@@ -329,10 +305,6 @@ export default function ThoughtsClient() {
                             alt={post.title || 'thought'} 
                             width={600}
                             height={200}
-                            loading="lazy"
-                            quality={85}
-                            placeholder="blur"
-                            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mM8c+bMfwAGgAL+DAhGLAAAAABJRU5ErkJggg=="
                             style={{
                               width: '100%',
                               height: '200px',

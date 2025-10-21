@@ -1,10 +1,9 @@
 "use client";
 import ThoughtsClient from './ThoughtsClient';
-import ErrorBoundary from '../components/ErrorBoundary';
 
 export default function ThoughtsPage() {
   return (
-    <ErrorBoundary>
+    <>
       <section 
       style={{ 
         padding: 'clamp(1.5rem, 4vw, 3rem) clamp(1rem, 3vw, 1.5rem)',
@@ -56,6 +55,6 @@ export default function ThoughtsPage() {
         <ThoughtsClient />
       </div>
     </section>
-    </ErrorBoundary>
+    </>
   );
 }
