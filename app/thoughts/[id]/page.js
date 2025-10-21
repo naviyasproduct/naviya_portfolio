@@ -6,6 +6,174 @@ import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 
+// Rich Content Renderer Component
+function RichContent({ content, additionalMedia }) {
+  console.log('🎨 RichContent rendering:', {
+    contentLength: content?.length,
+    additionalMediaCount: additionalMedia?.length,
+    additionalMedia,
+  });
+  
+  const lines = content.split('\n');
+  let mediaIndex = 0;
+  
+  return (
+    <div style={{
+      fontSize: '1.1rem',
+      lineHeight: '1.8',
+      opacity: 0.9,
+      textAlign: 'left',
+    }}>
+      {lines.map((line, idx) => {
+        // Check for media placeholders
+        const imageMatch = line.match(/\[Image:\s*(\w+),\s*(\d+)%\]/i);
+        const videoMatch = line.match(/\[Video:\s*(\w+),\s*(\d+)%\]/i);
+        const audioMatch = line.match(/\[Audio\]/i);
+        
+        if (imageMatch) {
+          console.log('🖼️ Image placeholder found:', {
+            line,
+            match: imageMatch,
+            mediaIndex,
+            hasMedia: mediaIndex < additionalMedia.length,
+            media: additionalMedia[mediaIndex],
+          });
+        }
+        
+        if (imageMatch && mediaIndex < additionalMedia.length) {
+          const media = additionalMedia[mediaIndex];
+          const alignment = imageMatch[1] || 'center';
+          const widthPercent = parseInt(imageMatch[2]) || 70;
+          mediaIndex++;
+          
+          const alignmentMap = {
+            left: 'flex-start',
+            center: 'center',
+            right: 'flex-end'
+          };
+          
+          return (
+            <div 
+              key={`media-${idx}`}
+              style={{
+                display: 'flex',
+                justifyContent: alignmentMap[alignment] || 'center',
+                margin: '2rem 0',
+              }}
+            >
+              <div style={{
+                width: `${widthPercent}%`,
+                borderRadius: '12px',
+                overflow: 'hidden',
+                boxShadow: '0 4px 16px rgba(0, 0, 0, 0.1)',
+              }}>
+                <Image
+                  src={media.url}
+                  alt="Content image"
+                  width={800}
+                  height={600}
+                  style={{
+                    width: '100%',
+                    height: 'auto',
+                    display: 'block',
+                  }}
+                />
+              </div>
+            </div>
+          );
+        } else if (videoMatch && mediaIndex < additionalMedia.length) {
+          const media = additionalMedia[mediaIndex];
+          const alignment = videoMatch[1] || 'center';
+          const widthPercent = parseInt(videoMatch[2]) || 70;
+          mediaIndex++;
+          
+          const alignmentMap = {
+            left: 'flex-start',
+            center: 'center',
+            right: 'flex-end'
+          };
+          
+          return (
+            <div 
+              key={`media-${idx}`}
+              style={{
+                display: 'flex',
+                justifyContent: alignmentMap[alignment] || 'center',
+                margin: '2rem 0',
+              }}
+            >
+              <div style={{
+                width: `${widthPercent}%`,
+                borderRadius: '12px',
+                overflow: 'hidden',
+                boxShadow: '0 4px 16px rgba(0, 0, 0, 0.1)',
+              }}>
+                <video
+                  controls
+                  src={media.url}
+                  style={{
+                    width: '100%',
+                    height: 'auto',
+                    display: 'block',
+                  }}
+                />
+              </div>
+            </div>
+          );
+        } else if (audioMatch && mediaIndex < additionalMedia.length) {
+          const media = additionalMedia[mediaIndex];
+          mediaIndex++;
+          
+          return (
+            <div key={`media-${idx}`} style={{ margin: '2rem 0' }}>
+              <audio controls src={media.url} style={{ width: '100%' }} />
+            </div>
+          );
+        } else if (line.match(/^---+$/)) {
+          // Divider - Full width decorative line
+          return (
+            <div 
+              key={`divider-${idx}`}
+              style={{
+                margin: '3rem 0',
+                width: '100%',
+                height: '2px',
+                background: 'linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.5), rgba(168, 85, 247, 0.5), transparent)',
+                borderRadius: '2px',
+                boxShadow: '0 0 10px rgba(99, 102, 241, 0.3)',
+              }}
+            />
+          );
+        } else if (line.trim().startsWith('"') && line.trim().endsWith('"')) {
+          // Quote
+          return (
+            <blockquote 
+              key={`quote-${idx}`}
+              style={{
+                margin: '2rem 0',
+                padding: '1.5rem 2rem',
+                borderLeft: '4px solid rgba(99, 102, 241, 0.5)',
+                background: 'rgba(99, 102, 241, 0.05)',
+                borderRadius: '8px',
+                fontStyle: 'italic',
+                fontSize: '1.2rem',
+              }}
+            >
+              {line.trim().slice(1, -1)}
+            </blockquote>
+          );
+        } else if (line.trim()) {
+          // Regular text
+          return <p key={`text-${idx}`} style={{ marginBottom: '1rem' }}>{line}</p>;
+        } else {
+          // Empty line
+          return <br key={`br-${idx}`} />;
+        }
+      })}
+    </div>
+  );
+}
+
 export default function ThoughtPage() {
   const params = useParams();
   const [thought, setThought] = useState(null);
@@ -39,6 +207,14 @@ export default function ThoughtPage() {
         
         if (docSnap.exists()) {
           const data = { id: docSnap.id, ...docSnap.data() };
+          console.log('📥 Thought data loaded from Firestore:', {
+            id: data.id,
+            title: data.title,
+            contentLength: data.content?.length,
+            hasAdditionalMedia: !!data.additionalMedia,
+            additionalMediaCount: data.additionalMedia?.length || 0,
+            additionalMedia: data.additionalMedia,
+          });
           setThought(data);
           setLikeCount(data.likeCount || 0);
           
@@ -359,16 +535,10 @@ export default function ThoughtPage() {
           </div>
         )}
 
-        {/* Content */}
+        {/* Content with Media Blocks */}
         {thought.content && (
-          <div style={{
-            fontSize: '1.1rem',
-            lineHeight: '1.8',
-            opacity: 0.9,
-            whiteSpace: 'pre-wrap',
-            textAlign: 'left',
-          }}>
-            {thought.content}
+          <div>
+            <RichContent content={thought.content} additionalMedia={thought.additionalMedia || []} />
           </div>
         )}
 

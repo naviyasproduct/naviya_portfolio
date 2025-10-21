@@ -8,8 +8,14 @@ export async function POST(req) {
   }
   if (password === admin) {
     const res = NextResponse.json({ ok: true });
-    // set a simple cookie (HttpOnly)
-    res.cookies.set('isAdmin', '1', { httpOnly: true, path: '/' });
+    // set a simple cookie (HttpOnly) - using new auth system cookie name
+    res.cookies.set('admin-authenticated', 'true', { 
+      httpOnly: true, 
+      path: '/',
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 60 * 60 * 24 * 7, // 7 days
+    });
     return res;
   }
   return NextResponse.json({ message: 'Invalid' }, { status: 401 });

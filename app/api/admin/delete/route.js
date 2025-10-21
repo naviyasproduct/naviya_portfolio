@@ -4,7 +4,7 @@ import { adminDb } from '../../../../lib/firebaseAdmin';
 
 export async function POST(req) {
   const cookieStore = await cookies();
-  const isAdmin = cookieStore.get('isAdmin')?.value === '1';
+  const isAdmin = cookieStore.get('admin-authenticated')?.value === 'true';
   if (!isAdmin) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
 
   try {

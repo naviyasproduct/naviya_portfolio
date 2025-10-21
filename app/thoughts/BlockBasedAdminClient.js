@@ -119,19 +119,19 @@ export default function BlockBasedAdminClient() {
         additionalMedia.push({
           type: 'image',
           url: uploaded.url,
-          alignment: block.alignment,
-          size: block.size,
+          alignment: block.alignment || 'center',
+          widthPercent: block.widthPercent || 70,
         });
-        finalContent += `[Image: ${block.alignment}, ${block.size}]\n\n`;
+        finalContent += `[Image: ${block.alignment || 'center'}, ${block.widthPercent || 70}%]\n\n`;
       } else if (block.type === BLOCK_TYPES.VIDEO && block.file) {
         const uploaded = await uploadToCloudinary(block.file);
         additionalMedia.push({
           type: 'video',
           url: uploaded.url,
-          alignment: block.alignment,
-          size: block.size,
+          alignment: block.alignment || 'center',
+          widthPercent: block.widthPercent || 70,
         });
-        finalContent += `[Video: ${block.alignment}, ${block.size}]\n\n`;
+        finalContent += `[Video: ${block.alignment || 'center'}, ${block.widthPercent || 70}%]\n\n`;
       } else if (block.type === BLOCK_TYPES.AUDIO && block.file) {
         const uploaded = await uploadToCloudinary(block.file);
         additionalMedia.push({
@@ -158,6 +158,16 @@ export default function BlockBasedAdminClient() {
     
     try {
       const { finalContent, mediaUrl, mediaType, additionalMedia } = await processBlocks();
+
+      console.log('📤 Sending to API:', {
+        title,
+        contentLength: finalContent.length,
+        content: finalContent,
+        mediaUrl,
+        mediaType,
+        additionalMediaCount: additionalMedia.length,
+        additionalMedia,
+      });
 
       const createRes = await fetch('/api/admin/create', {
         method: 'POST',
@@ -208,8 +218,46 @@ export default function BlockBasedAdminClient() {
     }
   }
 
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/admin/logout', { method: 'POST' });
+      window.location.href = '/admin/login';
+    } catch (err) {
+      console.error('Logout failed:', err);
+    }
+  };
+
   return (
     <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '2rem 1rem' }}>
+      {/* Logout Button */}
+      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1.5rem' }}>
+        <button
+          onClick={handleLogout}
+          type="button"
+          style={{
+            padding: '0.75rem 1.5rem',
+            background: 'rgba(239, 68, 68, 0.1)',
+            border: '1.5px solid rgba(239, 68, 68, 0.3)',
+            borderRadius: '12px',
+            fontSize: '0.95rem',
+            fontWeight: '600',
+            color: '#ef4444',
+            cursor: 'pointer',
+            transition: 'all 0.3s ease',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = 'rgba(239, 68, 68, 0.2)';
+            e.currentTarget.style.borderColor = 'rgba(239, 68, 68, 0.5)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = 'rgba(239, 68, 68, 0.1)';
+            e.currentTarget.style.borderColor = 'rgba(239, 68, 68, 0.3)';
+          }}
+        >
+          🚪 Logout
+        </button>
+      </div>
+
       {/* Create New Thought Section */}
       <div style={{
         background: 'rgba(255, 255, 255, 0.05)',
@@ -482,6 +530,10 @@ export default function BlockBasedAdminClient() {
 
 // Block Editor Component
 function BlockEditor({ block, index, totalBlocks, onUpdate, onDelete, onMove }) {
+  const [previewUrl, setPreviewUrl] = useState(null);
+  const [isResizing, setIsResizing] = useState(false);
+  const previewRef = useState(null);
+  
   const BLOCK_TYPES = {
     TEXT: 'text',
     IMAGE: 'image',
@@ -489,6 +541,59 @@ function BlockEditor({ block, index, totalBlocks, onUpdate, onDelete, onMove }) 
     AUDIO: 'audio',
     QUOTE: 'quote',
     DIVIDER: 'divider',
+  };
+  
+  // Create preview URL when file changes
+  useEffect(() => {
+    console.log('🔍 Preview useEffect triggered:', {
+      hasFile: !!block.file,
+      type: block.type,
+      fileName: block.file?.name,
+      blockId: block.id,
+    });
+    
+    if (block.file && (block.type === 'image' || block.type === 'video')) {
+      try {
+        const url = URL.createObjectURL(block.file);
+        console.log('✅ Preview URL created:', url);
+        setPreviewUrl(url);
+        return () => {
+          console.log('🧹 Cleaning up preview URL');
+          URL.revokeObjectURL(url);
+        };
+      } catch (err) {
+        console.error('❌ Failed to create preview URL:', err);
+      }
+    } else {
+      console.log('❌ No preview (file or type missing)');
+      setPreviewUrl(null);
+    }
+  }, [block.file, block.type, block.id]);
+  
+  // Handle drag-to-resize
+  const handleMouseDown = (e) => {
+    e.preventDefault();
+    setIsResizing(true);
+    
+    const startX = e.clientX;
+    const startWidth = block.widthPercent || 70;
+    const containerWidth = e.target.closest('.preview-container')?.offsetWidth || 800;
+    
+    const handleMouseMove = (moveEvent) => {
+      const deltaX = moveEvent.clientX - startX;
+      const deltaPercent = (deltaX / containerWidth) * 100;
+      const newWidth = Math.max(20, Math.min(100, startWidth + deltaPercent));
+      onUpdate(block.id, 'widthPercent', Math.round(newWidth));
+    };
+    
+    const handleMouseUp = () => {
+      setIsResizing(false);
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+    
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
   };
 
   return (
@@ -569,7 +674,14 @@ function BlockEditor({ block, index, totalBlocks, onUpdate, onDelete, onMove }) 
           <input
             type="file"
             accept={block.type === BLOCK_TYPES.IMAGE ? 'image/*' : 'video/*'}
-            onChange={(e) => onUpdate(block.id, 'file', e.target.files?.[0] || null)}
+            onChange={(e) => {
+              const file = e.target.files?.[0] || null;
+              onUpdate(block.id, 'file', file);
+              // Set default width if not set
+              if (!block.widthPercent) {
+                onUpdate(block.id, 'widthPercent', 70);
+              }
+            }}
             style={{ marginBottom: '1rem' }}
           />
           {block.file && (
@@ -577,37 +689,199 @@ function BlockEditor({ block, index, totalBlocks, onUpdate, onDelete, onMove }) 
               ✅ {block.file.name}
             </div>
           )}
-          <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
-            <div>
-              <label style={{ fontSize: '0.85rem', opacity: 0.7, display: 'block', marginBottom: '0.5rem' }}>
-                Alignment:
-              </label>
-              <select
-                value={block.alignment}
-                onChange={(e) => onUpdate(block.id, 'alignment', e.target.value)}
-                style={selectStyle}
-              >
-                <option value="left">Left</option>
-                <option value="center">Center</option>
-                <option value="right">Right</option>
-              </select>
-            </div>
-            <div>
-              <label style={{ fontSize: '0.85rem', opacity: 0.7, display: 'block', marginBottom: '0.5rem' }}>
-                Size:
-              </label>
-              <select
-                value={block.size}
-                onChange={(e) => onUpdate(block.id, 'size', e.target.value)}
-                style={selectStyle}
-              >
-                <option value="small">Small</option>
-                <option value="medium">Medium</option>
-                <option value="large">Large</option>
-                <option value="full">Full Width</option>
-              </select>
+          
+          {/* Alignment Buttons */}
+          <div style={{ marginBottom: '1rem' }}>
+            <label style={{ fontSize: '0.85rem', opacity: 0.7, display: 'block', marginBottom: '0.5rem' }}>
+              Alignment:
+            </label>
+            <div style={{ display: 'flex', gap: '0.5rem' }}>
+              {['left', 'center', 'right'].map(align => (
+                <button
+                  key={align}
+                  type="button"
+                  onClick={() => onUpdate(block.id, 'alignment', align)}
+                  style={{
+                    padding: '0.5rem 1rem',
+                    background: block.alignment === align 
+                      ? 'rgba(99, 102, 241, 0.3)' 
+                      : 'rgba(255, 255, 255, 0.05)',
+                    border: '1px solid ' + (block.alignment === align 
+                      ? 'rgba(99, 102, 241, 0.5)' 
+                      : 'rgba(255, 255, 255, 0.15)'),
+                    borderRadius: '6px',
+                    fontSize: '0.85rem',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                  }}
+                >
+                  {align.charAt(0).toUpperCase() + align.slice(1)}
+                </button>
+              ))}
             </div>
           </div>
+          
+          {/* Width Slider */}
+          <div style={{ marginBottom: '1rem' }}>
+            <label style={{ fontSize: '0.85rem', opacity: 0.7, display: 'block', marginBottom: '0.5rem' }}>
+              Width: {block.widthPercent || 70}%
+            </label>
+            <input
+              type="range"
+              min="20"
+              max="100"
+              value={block.widthPercent || 70}
+              onChange={(e) => onUpdate(block.id, 'widthPercent', parseInt(e.target.value))}
+              style={{
+                width: '100%',
+                height: '6px',
+                borderRadius: '3px',
+                outline: 'none',
+                background: 'linear-gradient(90deg, rgba(99, 102, 241, 0.3), rgba(168, 85, 247, 0.3))',
+                cursor: 'pointer',
+              }}
+            />
+            <div style={{ 
+              display: 'flex', 
+              justifyContent: 'space-between', 
+              fontSize: '0.75rem', 
+              opacity: 0.5,
+              marginTop: '0.25rem'
+            }}>
+              <span>20%</span>
+              <span>100%</span>
+            </div>
+          </div>
+          
+          {/* Live Preview with Drag-to-Resize */}
+          {previewUrl && (
+            <div 
+              className="preview-container"
+              style={{
+                marginTop: '1.5rem',
+                padding: '1.5rem',
+                background: 'rgba(0, 0, 0, 0.3)',
+                borderRadius: '12px',
+                border: '2px solid rgba(99, 102, 241, 0.3)',
+                position: 'relative',
+              }}
+            >
+              <div style={{
+                fontSize: '0.9rem',
+                fontWeight: '600',
+                marginBottom: '1rem',
+                textAlign: 'center',
+                color: 'rgba(99, 102, 241, 1)',
+              }}>
+                📸 Live Preview - Drag edges to resize
+              </div>
+              <div style={{
+                display: 'flex',
+                justifyContent: block.alignment === 'left' ? 'flex-start' : block.alignment === 'right' ? 'flex-end' : 'center',
+                minHeight: '150px',
+                padding: '1rem',
+                background: 'rgba(0, 0, 0, 0.2)',
+                borderRadius: '8px',
+              }}>
+                <div style={{
+                  width: `${block.widthPercent || 70}%`,
+                  borderRadius: '8px',
+                  overflow: 'hidden',
+                  boxShadow: isResizing 
+                    ? '0 8px 32px rgba(99, 102, 241, 0.5)' 
+                    : '0 4px 16px rgba(0, 0, 0, 0.3)',
+                  border: isResizing 
+                    ? '3px solid rgba(99, 102, 241, 0.8)' 
+                    : '2px solid rgba(99, 102, 241, 0.5)',
+                  position: 'relative',
+                  transition: isResizing ? 'none' : 'all 0.2s ease',
+                  cursor: 'ew-resize',
+                }}>
+                  {block.type === 'image' ? (
+                    <img
+                      src={previewUrl}
+                      alt="Preview"
+                      onMouseDown={handleMouseDown}
+                      style={{
+                        width: '100%',
+                        height: 'auto',
+                        display: 'block',
+                        pointerEvents: 'auto',
+                        cursor: 'ew-resize',
+                      }}
+                    />
+                  ) : (
+                    <div style={{ position: 'relative' }}>
+                      <video
+                        src={previewUrl}
+                        controls
+                        style={{
+                          width: '100%',
+                          height: 'auto',
+                          display: 'block',
+                        }}
+                      />
+                      <div
+                        onMouseDown={handleMouseDown}
+                        style={{
+                          position: 'absolute',
+                          top: 0,
+                          left: 0,
+                          right: 0,
+                          bottom: 0,
+                          cursor: 'ew-resize',
+                          background: 'transparent',
+                          pointerEvents: 'auto',
+                        }}
+                      />
+                    </div>
+                  )}
+                  
+                  {/* Resize Handles */}
+                  <div
+                    onMouseDown={handleMouseDown}
+                    style={{
+                      position: 'absolute',
+                      top: 0,
+                      right: -4,
+                      bottom: 0,
+                      width: '8px',
+                      background: 'rgba(99, 102, 241, 0.6)',
+                      cursor: 'ew-resize',
+                      opacity: isResizing ? 1 : 0,
+                      transition: 'opacity 0.2s',
+                    }}
+                    onMouseEnter={(e) => e.currentTarget.style.opacity = 1}
+                    onMouseLeave={(e) => !isResizing && (e.currentTarget.style.opacity = 0)}
+                  />
+                  <div
+                    onMouseDown={handleMouseDown}
+                    style={{
+                      position: 'absolute',
+                      top: 0,
+                      left: -4,
+                      bottom: 0,
+                      width: '8px',
+                      background: 'rgba(99, 102, 241, 0.6)',
+                      cursor: 'ew-resize',
+                      opacity: isResizing ? 1 : 0,
+                      transition: 'opacity 0.2s',
+                    }}
+                    onMouseEnter={(e) => e.currentTarget.style.opacity = 1}
+                    onMouseLeave={(e) => !isResizing && (e.currentTarget.style.opacity = 0)}
+                  />
+                </div>
+              </div>
+              <div style={{
+                marginTop: '0.75rem',
+                textAlign: 'center',
+                fontSize: '0.85rem',
+                opacity: 0.6,
+              }}>
+                💡 Click and drag the image to resize
+              </div>
+            </div>
+          )}
         </>
       )}
 
