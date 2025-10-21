@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { collection, query, orderBy, getDocs } from 'firebase/firestore';
 import { db } from '../../lib/firebaseConfig';
+import Link from 'next/link';
 
 export default function BlockBasedAdminClient() {
   // Content blocks system
@@ -234,11 +235,42 @@ export default function BlockBasedAdminClient() {
       padding: '1rem',
     }}>
       {/* Logout Button */}
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'flex-end', 
+      <div style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
         marginBottom: '1rem',
+        gap: '1rem',
+        flexWrap: 'wrap',
       }}>
+        <Link
+          href="/thoughts/manage"
+          style={{
+            padding: '0.65rem 1.25rem',
+            background: 'rgba(99, 102, 241, 0.15)',
+            border: '1.5px solid rgba(99, 102, 241, 0.3)',
+            borderRadius: '12px',
+            fontSize: 'clamp(0.85rem, 2vw, 0.95rem)',
+            fontWeight: '600',
+            color: 'inherit',
+            cursor: 'pointer',
+            transition: 'all 0.3s ease',
+            textDecoration: 'none',
+            display: 'inline-block',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = 'rgba(99, 102, 241, 0.25)';
+            e.currentTarget.style.borderColor = 'rgba(99, 102, 241, 0.5)';
+            e.currentTarget.style.transform = 'translateY(-2px)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = 'rgba(99, 102, 241, 0.15)';
+            e.currentTarget.style.borderColor = 'rgba(99, 102, 241, 0.3)';
+            e.currentTarget.style.transform = 'translateY(0)';
+          }}
+        >
+          📋 Manage Thoughts
+        </Link>
         <button
           onClick={handleLogout}
           type="button"
@@ -264,9 +296,7 @@ export default function BlockBasedAdminClient() {
         >
           🚪 Logout
         </button>
-      </div>
-
-      {/* Create New Thought Section */}
+      </div>      {/* Create New Thought Section */}
       <div style={{
         background: 'rgba(255, 255, 255, 0.05)',
         backdropFilter: 'blur(30px)',
