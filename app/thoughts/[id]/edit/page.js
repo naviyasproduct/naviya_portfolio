@@ -499,6 +499,10 @@ export default function EditThoughtPage() {
                         alt="Content image"
                         width={600}
                         height={400}
+                        loading="lazy"
+                        quality={85}
+                        placeholder="blur"
+                        blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mM8c+bMfwAGgAL+DAhGLAAAAABJRU5ErkJggg=="
                         style={{
                           width: '100%',
                           height: 'auto',

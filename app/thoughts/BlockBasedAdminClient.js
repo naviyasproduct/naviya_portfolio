@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { collection, query, orderBy, getDocs } from 'firebase/firestore';
 import { db } from '../../lib/firebaseConfig';
+import Image from 'next/image';
 
 export default function BlockBasedAdminClient() {
   // Content blocks system
@@ -851,9 +852,12 @@ function BlockEditor({ block, index, totalBlocks, onUpdate, onDelete, onMove }) 
                   cursor: 'ew-resize',
                 }}>
                   {block.type === 'image' ? (
-                    <img
+                    <Image
                       src={previewUrl}
                       alt="Preview"
+                      width={800}
+                      height={600}
+                      unoptimized
                       onMouseDown={handleMouseDown}
                       style={{
                         width: '100%',

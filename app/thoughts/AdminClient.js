@@ -223,6 +223,10 @@ export default function AdminClient() {
                     alt={p.title || 'media'} 
                     width={800}
                     height={400}
+                    loading="lazy"
+                    quality={85}
+                    placeholder="blur"
+                    blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mM8c+bMfwAGgAL+DAhGLAAAAABJRU5ErkJggg=="
                     className="w-full max-h-96 object-contain rounded-xl" 
                     style={{ height: 'auto' }}
                   />

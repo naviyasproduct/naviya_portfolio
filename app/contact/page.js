@@ -1,8 +1,11 @@
 "use client";
-import { useState, useRef } from 'react';
+import { useState, useRef, lazy, Suspense } from 'react';
 import emailjs from '@emailjs/browser';
-import SplashCursor from './animationCursor';
 import { useCursorAnimation } from '../context/CursorAnimationContext';
+import ErrorBoundary from '../components/ErrorBoundary';
+
+// Lazy load the cursor animation (heavy component)
+const SplashCursor = lazy(() => import('./animationCursor'));
 
 export default function ContactPage() {
   const { isCursorAnimationEnabled } = useCursorAnimation();
@@ -73,15 +76,20 @@ export default function ContactPage() {
   };
 
   return (
-    <>
-      {/* Cursor Animation Effect - Only show if enabled */}
-      {isCursorAnimationEnabled && <SplashCursor />}
-      
-      <div 
-        className="min-h-[calc(100vh-130px)] flex items-center justify-center"
-        style={{
-          position: 'relative',
-          zIndex: 10,
+    <ErrorBoundary>
+      <>
+        {/* Cursor Animation Effect - Only show if enabled, lazy loaded */}
+        {isCursorAnimationEnabled && (
+          <Suspense fallback={null}>
+            <SplashCursor />
+          </Suspense>
+        )}
+        
+        <div 
+          className="min-h-[calc(100vh-130px)] flex items-center justify-center"
+          style={{
+            position: 'relative',
+            zIndex: 10,
           padding: 'clamp(1.5rem, 4vw, 2.5rem) clamp(1rem, 3vw, 1.5rem)',
         }}
       >
@@ -420,8 +428,9 @@ export default function ContactPage() {
             </button>
           </form>
         </div>
+        </div>
       </div>
-      </div>
-    </>
+      </>
+    </ErrorBoundary>
   );
 }

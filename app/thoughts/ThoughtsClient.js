@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo, useCallback } from 'react';
 import { collection, getDocs, query, orderBy } from 'firebase/firestore';
 import { db } from '../../lib/firebaseConfig';
 import Image from 'next/image';
@@ -8,7 +8,33 @@ export default function ThoughtsClient() {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [expandedDates, setExpandedDates] = useState(new Set());
-  const [groupedPosts, setGroupedPosts] = useState({});
+
+  // Memoize grouped posts calculation
+  const groupedPosts = useMemo(() => {
+    const grouped = {};
+    const today = new Date().toDateString();
+    
+    posts.forEach(post => {
+      if (post.createdAt?.toDate) {
+        const date = post.createdAt.toDate();
+        const dateString = date.toDateString();
+        
+        if (!grouped[dateString]) {
+          grouped[dateString] = [];
+        }
+        grouped[dateString].push(post);
+      }
+    });
+    
+    return grouped;
+  }, [posts]);
+
+  // Memoize sorted dates
+  const sortedDates = useMemo(() => {
+    return Object.keys(groupedPosts).sort((a, b) => {
+      return new Date(b) - new Date(a);
+    });
+  }, [groupedPosts]);
 
   useEffect(() => {
     let mounted = true;
@@ -22,25 +48,17 @@ export default function ThoughtsClient() {
         const postsData = snap.docs.map(d => ({ id: d.id, ...d.data() }));
         setPosts(postsData);
         
-        // Group posts by date
-        const grouped = {};
+        // Auto-expand today's posts
         const today = new Date().toDateString();
-        
+        const grouped = {};
         postsData.forEach(post => {
           if (post.createdAt?.toDate) {
-            const date = post.createdAt.toDate();
-            const dateString = date.toDateString();
-            
-            if (!grouped[dateString]) {
-              grouped[dateString] = [];
-            }
+            const dateString = post.createdAt.toDate().toDateString();
+            if (!grouped[dateString]) grouped[dateString] = [];
             grouped[dateString].push(post);
           }
         });
         
-        setGroupedPosts(grouped);
-        
-        // Auto-expand today's posts
         if (grouped[today]) {
           setExpandedDates(new Set([today]));
         }
@@ -60,7 +78,8 @@ export default function ThoughtsClient() {
     return () => { mounted = false };
   }, []);
 
-  const toggleDate = (dateString) => {
+  // Memoize toggle function
+  const toggleDate = useCallback((dateString) => {
     setExpandedDates(prev => {
       const newSet = new Set(prev);
       if (newSet.has(dateString)) {
@@ -70,7 +89,7 @@ export default function ThoughtsClient() {
       }
       return newSet;
     });
-  };
+  }, []);
 
   if (loading) return (
     <div 
@@ -115,7 +134,6 @@ export default function ThoughtsClient() {
   );
 
   const today = new Date().toDateString();
-  const sortedDates = Object.keys(groupedPosts).sort((a, b) => new Date(b) - new Date(a));
 
   return (
     <div style={{ 
@@ -311,6 +329,10 @@ export default function ThoughtsClient() {
                             alt={post.title || 'thought'} 
                             width={600}
                             height={200}
+                            loading="lazy"
+                            quality={85}
+                            placeholder="blur"
+                            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mM8c+bMfwAGgAL+DAhGLAAAAABJRU5ErkJggg=="
                             style={{
                               width: '100%',
                               height: '200px',

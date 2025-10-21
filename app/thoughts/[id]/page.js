@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { doc, getDoc, collection, addDoc, query, orderBy, onSnapshot, updateDoc, increment, arrayUnion, arrayRemove } from 'firebase/firestore';
 import { db } from '../../../lib/firebaseConfig';
 import { useParams } from 'next/navigation';
@@ -72,6 +72,10 @@ function RichContent({ content, additionalMedia }) {
                   alt="Content image"
                   width={800}
                   height={600}
+                  loading="lazy"
+                  quality={85}
+                  placeholder="blur"
+                  blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mM8c+bMfwAGgAL+DAhGLAAAAABJRU5ErkJggg=="
                   style={{
                     width: '100%',
                     height: 'auto',
@@ -609,6 +613,9 @@ export default function ThoughtPage() {
                 alt={thought.title || 'thought'} 
                 width={800}
                 height={600}
+                quality={90}
+                placeholder="blur"
+                blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mM8c+bMfwAGgAL+DAhGLAAAAABJRU5ErkJggg=="
                 style={{
                   width: '100%',
                   height: 'auto',

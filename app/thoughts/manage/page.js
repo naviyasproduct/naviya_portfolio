@@ -1,10 +1,11 @@
 "use client";
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { collection, query, orderBy, getDocs } from 'firebase/firestore';
 import { db } from '../../../lib/firebaseConfig';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
+import ErrorBoundary from '../../components/ErrorBoundary';
 
 export default function ManageThoughtsPage() {
   const router = useRouter();
@@ -115,12 +116,13 @@ export default function ManageThoughtsPage() {
   }
 
   return (
-    <div style={{
-      minHeight: '100vh',
-      padding: 'clamp(1.5rem, 4vw, 3rem) clamp(1rem, 3vw, 1.5rem)',
-    }}>
+    <ErrorBoundary>
       <div style={{
-        maxWidth: '1400px',
+        minHeight: '100vh',
+        padding: 'clamp(1.5rem, 4vw, 3rem) clamp(1rem, 3vw, 1.5rem)',
+      }}>
+        <div style={{
+          maxWidth: '1400px',
         margin: '0 auto',
       }}>
         {/* Header */}
@@ -406,6 +408,10 @@ export default function ManageThoughtsPage() {
                       src={thought.mediaUrl}
                       alt={thought.title}
                       fill
+                      loading="lazy"
+                      quality={85}
+                      placeholder="blur"
+                      blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mM8c+bMfwAGgAL+DAhGLAAAAABJRU5ErkJggg=="
                       style={{ objectFit: 'cover' }}
                     />
                   </div>
@@ -558,7 +564,8 @@ export default function ManageThoughtsPage() {
             })}
           </div>
         )}
+        </div>
       </div>
-    </div>
+    </ErrorBoundary>
   );
 }
