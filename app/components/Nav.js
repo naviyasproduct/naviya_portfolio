@@ -123,54 +123,58 @@ export default function Nav() {
         </div>
       </div>
       
-      {/* Mobile Menu Dropdown */}
+      {/* Mobile Menu Dropdown - Simple and compact */}
       {mobileMenuOpen && (
         <div 
           className="sm:hidden"
           style={{
             position: 'absolute',
-            top: 'clamp(70px, 15vw, 90px)',
-            left: 'clamp(0.5rem, 2vw, 1rem)',
+            top: 'clamp(65px, 12vw, 75px)',
             right: 'clamp(0.5rem, 2vw, 1rem)',
-            background: 'rgba(255, 255, 255, 0.1)',
-            backdropFilter: 'blur(30px)',
-            WebkitBackdropFilter: 'blur(30px)',
-            border: '1px solid rgba(255, 255, 255, 0.15)',
-            borderRadius: '20px',
-            padding: 'clamp(0.75rem, 2.5vw, 1rem)',
-            boxShadow: '0 8px 32px 0 rgba(0, 0, 0, 0.2)',
-            animation: 'slideDown 0.3s ease',
+            background: 'rgba(0, 0, 0, 0.85)',
+            backdropFilter: 'blur(10px)',
+            WebkitBackdropFilter: 'blur(10px)',
+            borderRadius: '8px',
+            padding: '0.35rem',
+            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
+            animation: 'slideDown 0.2s ease',
             zIndex: 90,
+            width: 'auto',
+            minWidth: '100px',
           }}
         >
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
             <Link 
               href="/thoughts" 
               onClick={() => setMobileMenuOpen(false)}
               style={{
-                padding: '0.75rem',
-                borderRadius: '12px',
-                textAlign: 'center',
-                background: pathname === '/thoughts' ? 'rgba(99, 102, 241, 0.2)' : 'rgba(255, 255, 255, 0.05)',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
-                transition: 'all 0.2s ease',
+                padding: '0.5rem 0.75rem',
+                fontSize: '0.875rem',
+                textAlign: 'left',
+                color: 'white',
+                transition: 'opacity 0.2s ease',
+                opacity: pathname === '/thoughts' ? '1' : '0.8',
               }}
+              onMouseEnter={(e) => e.currentTarget.style.opacity = '1'}
+              onMouseLeave={(e) => e.currentTarget.style.opacity = pathname === '/thoughts' ? '1' : '0.8'}
             >
-              💭 Thoughts
+              Thoughts
             </Link>
             <Link 
               href="/contact" 
               onClick={() => setMobileMenuOpen(false)}
               style={{
-                padding: '0.75rem',
-                borderRadius: '12px',
-                textAlign: 'center',
-                background: pathname === '/contact' ? 'rgba(99, 102, 241, 0.2)' : 'rgba(255, 255, 255, 0.05)',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
-                transition: 'all 0.2s ease',
+                padding: '0.5rem 0.75rem',
+                fontSize: '0.875rem',
+                textAlign: 'left',
+                color: 'white',
+                transition: 'opacity 0.2s ease',
+                opacity: pathname === '/contact' ? '1' : '0.8',
               }}
+              onMouseEnter={(e) => e.currentTarget.style.opacity = '1'}
+              onMouseLeave={(e) => e.currentTarget.style.opacity = pathname === '/contact' ? '1' : '0.8'}
             >
-              📧 Contact
+              Contact
             </Link>
           </div>
         </div>

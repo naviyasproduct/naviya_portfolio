@@ -163,6 +163,11 @@ nav.sticky {
   height: 100% !important;
   display: block;
   object-fit: cover;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  -webkit-touch-callout: none !important;
+  -moz-user-select: none !important;
+  -ms-user-select: none !important;
 }
 
 /* Mobile menu animation */

@@ -15,7 +15,10 @@ export default function Home() {
       width: '100vw', 
       height: '100vh',
       overflow: 'hidden',
-      zIndex: 0
+      zIndex: 0,
+      userSelect: 'none',
+      WebkitUserSelect: 'none',
+      WebkitTouchCallout: 'none',
     }}>
       {/* Hero Section with 3D Animation */}
       <div style={{ 
@@ -24,7 +27,10 @@ export default function Home() {
         left: 0,
         width: '100%', 
         height: '100%',
-        zIndex: 0
+        zIndex: 0,
+        userSelect: 'none',
+        WebkitUserSelect: 'none',
+        WebkitTouchCallout: 'none',
       }}>
         <HeroSection />
         

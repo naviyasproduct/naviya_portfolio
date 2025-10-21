@@ -1151,10 +1151,10 @@ const Hyperspeed = ({
   }, [effectOptions, theme, isReady]);
 
   if (!isReady) {
-    return <div id="lights" className="w-full h-full" style={{ background: 'var(--bg-primary)' }} />;
+    return <div id="lights" className="w-full h-full" style={{ background: 'var(--bg-primary)', userSelect: 'none', WebkitUserSelect: 'none', WebkitTouchCallout: 'none' }} />;
   }
 
-  return <div id="lights" className="w-full h-full" ref={hyperspeed}></div>;
+  return <div id="lights" className="w-full h-full" ref={hyperspeed} style={{ userSelect: 'none', WebkitUserSelect: 'none', WebkitTouchCallout: 'none' }}></div>;
 };
 
 export default Hyperspeed;
