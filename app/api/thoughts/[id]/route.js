@@ -1,26 +1,26 @@
 import { NextResponse } from 'next/server';
-import { db } from '../../../../lib/firebaseConfig';
-import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { adminDb } from '../../../../lib/firebaseAdmin';
 
 export async function GET(request, { params }) {
   try {
     const { id } = params;
     
-    const docRef = doc(db, 'thoughts', id);
-    const docSnap = await getDoc(docRef);
+    const docRef = adminDb.collection('thoughts').doc(id);
+    const docSnap = await docRef.get();
 
-    if (!docSnap.exists()) {
+    if (!docSnap.exists) {
       return NextResponse.json(
         { success: false, error: 'Thought not found' },
         { status: 404 }
       );
     }
 
+    const data = docSnap.data();
     const thought = {
       id: docSnap.id,
-      ...docSnap.data(),
-      createdAt: docSnap.data().createdAt?.toDate ? docSnap.data().createdAt.toDate().toISOString() : null,
-      updatedAt: docSnap.data().updatedAt?.toDate ? docSnap.data().updatedAt.toDate().toISOString() : null,
+      ...data,
+      createdAt: data.createdAt?._seconds ? new Date(data.createdAt._seconds * 1000).toISOString() : null,
+      updatedAt: data.updatedAt?._seconds ? new Date(data.updatedAt._seconds * 1000).toISOString() : null,
     };
 
     return NextResponse.json({ success: true, thought });
@@ -46,18 +46,18 @@ export async function PUT(request, { params }) {
       );
     }
 
-    const docRef = doc(db, 'thoughts', id);
+    const docRef = adminDb.collection('thoughts').doc(id);
     
     // Check if document exists
-    const docSnap = await getDoc(docRef);
-    if (!docSnap.exists()) {
+    const docSnap = await docRef.get();
+    if (!docSnap.exists) {
       return NextResponse.json(
         { success: false, error: 'Thought not found' },
         { status: 404 }
       );
     }
 
-    await updateDoc(docRef, {
+    await docRef.update({
       title: title.trim(),
       blocks: blocks || [],
       updatedAt: new Date(),

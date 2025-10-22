@@ -6,7 +6,114 @@ import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 
-// Rich Content Renderer Component
+// Block Renderer Component (for new block structure)
+function BlockRenderer({ blocks }) {
+  if (!blocks || blocks.length === 0) return null;
+
+  return (
+    <div style={{
+      display: 'flex',
+      flexDirection: 'column',
+      gap: '2rem',
+    }}>
+      {blocks.map((block, idx) => {
+        if (block.type === 'text') {
+          return (
+            <div
+              key={idx}
+              style={{
+                fontSize: '1.1rem',
+                lineHeight: '1.8',
+                opacity: 0.9,
+                textAlign: 'left',
+                whiteSpace: 'pre-wrap',
+              }}
+            >
+              {block.content}
+            </div>
+          );
+        }
+
+        if (block.type === 'image') {
+          const alignment = block.alignment || 'center';
+          const widthPercent = block.widthPercent || 80;
+
+          const alignmentMap = {
+            left: 'flex-start',
+            center: 'center',
+            right: 'flex-end',
+          };
+
+          return (
+            <div
+              key={idx}
+              style={{
+                display: 'flex',
+                justifyContent: alignmentMap[alignment],
+                width: '100%',
+                marginBottom: '1.5rem',
+              }}
+            >
+              <div style={{ width: `${widthPercent}%` }}>
+                <Image
+                  src={block.url}
+                  alt={`Image ${idx + 1}`}
+                  width={800}
+                  height={600}
+                  style={{
+                    width: '100%',
+                    height: 'auto',
+                    borderRadius: '12px',
+                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+                  }}
+                />
+              </div>
+            </div>
+          );
+        }
+
+        if (block.type === 'video') {
+          const alignment = block.alignment || 'center';
+          const widthPercent = block.widthPercent || 80;
+
+          const alignmentMap = {
+            left: 'flex-start',
+            center: 'center',
+            right: 'flex-end',
+          };
+
+          return (
+            <div
+              key={idx}
+              style={{
+                display: 'flex',
+                justifyContent: alignmentMap[alignment],
+                width: '100%',
+                marginBottom: '1.5rem',
+              }}
+            >
+              <div style={{ width: `${widthPercent}%` }}>
+                <video
+                  controls
+                  src={block.url}
+                  style={{
+                    width: '100%',
+                    borderRadius: '12px',
+                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+                  }}
+                />
+              </div>
+            </div>
+          );
+        }
+
+        return null;
+      })}
+    </div>
+  );
+}
+
+// Rich Content Renderer Component (for old content structure)
 function RichContent({ content, additionalMedia }) {
   console.log('🎨 RichContent rendering:', {
     contentLength: content?.length,
@@ -497,8 +604,8 @@ export default function ThoughtPage() {
           </h1>
         )}
 
-        {/* Media */}
-        {thought.mediaUrl && (
+        {/* Media - Only show if using old structure (no blocks) */}
+        {thought.mediaUrl && (!thought.blocks || thought.blocks.length === 0) && (
           <div style={{
             marginBottom: '2.5rem',
             borderRadius: '20px',
@@ -537,11 +644,14 @@ export default function ThoughtPage() {
         )}
 
         {/* Content with Media Blocks */}
-        {thought.content && (
+        {/* Render new block structure if available, otherwise fall back to old structure */}
+        {thought.blocks && thought.blocks.length > 0 ? (
+          <BlockRenderer blocks={thought.blocks} />
+        ) : thought.content ? (
           <div>
             <RichContent content={thought.content} additionalMedia={thought.additionalMedia || []} />
           </div>
-        )}
+        ) : null}
 
         {/* Likes & Share Section */}
         <div style={{

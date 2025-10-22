@@ -15,6 +15,60 @@ export default function EditThoughtPage() {
   const [comments, setComments] = useState([]);
   const [deletingComment, setDeletingComment] = useState(null);
   const [showAddBlock, setShowAddBlock] = useState(false);
+  const [uploadingBlocks, setUploadingBlocks] = useState(new Set());
+
+  // Upload image/video to Cloudinary
+  const uploadToCloudinary = async (file, blockIndex) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET);
+    
+    const resourceType = file.type.startsWith('video/') ? 'video' : 'image';
+    
+    try {
+      setUploadingBlocks(prev => new Set(prev).add(blockIndex));
+      
+      const response = await fetch(
+        `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/${resourceType}/upload`,
+        {
+          method: 'POST',
+          body: formData,
+        }
+      );
+
+      const data = await response.json();
+      
+      if (data.secure_url) {
+        updateBlock(blockIndex, 'url', data.secure_url);
+        return data.secure_url;
+      } else {
+        throw new Error('Upload failed');
+      }
+    } catch (error) {
+      console.error('Upload error:', error);
+      alert('Failed to upload file: ' + error.message);
+      return null;
+    } finally {
+      setUploadingBlocks(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(blockIndex);
+        return newSet;
+      });
+    }
+  };
+
+  // Block button style
+  const blockButtonStyle = {
+    padding: '0.6rem 1.2rem',
+    background: 'rgba(255, 255, 255, 0.08)',
+    border: '1px solid rgba(255, 255, 255, 0.15)',
+    borderRadius: '8px',
+    fontSize: '0.9rem',
+    fontWeight: '500',
+    cursor: 'pointer',
+    color: 'inherit',
+    transition: 'all 0.2s ease',
+  };
 
   // Load thought and comments via API
   useEffect(() => {
@@ -552,11 +606,58 @@ export default function EditThoughtPage() {
                       />
                     ) : (
                       <div>
+                        {/* File Upload Button */}
+                        <div style={{ marginBottom: '0.75rem' }}>
+                          <input
+                            type="file"
+                            accept={block.type === 'image' ? 'image/*' : 'video/*'}
+                            onChange={(e) => {
+                              const file = e.target.files[0];
+                              if (file) {
+                                uploadToCloudinary(file, index);
+                              }
+                            }}
+                            style={{ display: 'none' }}
+                            id={`file-upload-${index}`}
+                          />
+                          <label
+                            htmlFor={`file-upload-${index}`}
+                            style={{
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '0.5rem',
+                              padding: '0.75rem 1.25rem',
+                              background: uploadingBlocks.has(index) 
+                                ? 'rgba(99, 102, 241, 0.3)' 
+                                : 'rgba(99, 102, 241, 0.2)',
+                              border: '1px solid rgba(99, 102, 241, 0.3)',
+                              borderRadius: '8px',
+                              fontSize: '0.9rem',
+                              fontWeight: '500',
+                              cursor: uploadingBlocks.has(index) ? 'not-allowed' : 'pointer',
+                              transition: 'all 0.2s ease',
+                            }}
+                          >
+                            {uploadingBlocks.has(index) ? (
+                              <>
+                                <span>⏳</span>
+                                <span>Uploading...</span>
+                              </>
+                            ) : (
+                              <>
+                                <span>📤</span>
+                                <span>Upload {block.type === 'image' ? 'Image' : 'Video'}</span>
+                              </>
+                            )}
+                          </label>
+                        </div>
+
+                        {/* URL Input (optional - for direct URL paste) */}
                         <input
                           type="url"
                           value={block.url || ''}
                           onChange={(e) => updateBlock(index, 'url', e.target.value)}
-                          placeholder={`Enter ${block.type} URL (e.g., Cloudinary URL)...`}
+                          placeholder={`Or paste ${block.type} URL directly...`}
                           style={{
                             width: '100%',
                             padding: '0.75rem',

@@ -1,20 +1,22 @@
 import { NextResponse } from 'next/server';
-import { db } from '../../../../../lib/firebaseConfig';
-import { collection, query, where, getDocs } from 'firebase/firestore';
+import { adminDb } from '../../../../../lib/firebaseAdmin';
 
 export async function GET(request, { params }) {
   try {
     const { id } = params;
     
-    const commentsRef = collection(db, 'comments');
-    const q = query(commentsRef, where('thoughtId', '==', id));
-    const commentsSnap = await getDocs(q);
+    const commentsSnap = await adminDb.collection('comments')
+      .where('thoughtId', '==', id)
+      .get();
     
-    const comments = commentsSnap.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data(),
-      createdAt: doc.data().createdAt?.toDate ? doc.data().createdAt.toDate().toISOString() : new Date().toISOString(),
-    }));
+    const comments = commentsSnap.docs.map(doc => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        ...data,
+        createdAt: data.createdAt?._seconds ? new Date(data.createdAt._seconds * 1000).toISOString() : new Date().toISOString(),
+      };
+    });
 
     // Sort by newest first
     comments.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
